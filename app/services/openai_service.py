@@ -1,44 +1,40 @@
-import os
 import json
 
 from openai import OpenAI
-from dotenv import load_dotenv
-
-load_dotenv()
+from app.core.config import settings
 
 client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
+    api_key=settings.OPENAI_API_KEY
 )
 
 
 def generate_meal_plan(data):
 
     prompt = f"""
-    Actúa como un nutricionista deportivo profesional.
+Eres un nutricionista deportivo profesional.
 
-    Genera un plan alimenticio en formato JSON.
+Devuelve SOLO JSON válido.
 
-    Datos del alumno:
+Objetivo: {data.objetivo}
+Peso: {data.peso}
+Altura: {data.altura}
+Edad: {data.edad}
+Sexo: {data.sexo}
 
-    Objetivo: {data.objetivo}
-    Peso: {data.peso} kg
-    Altura: {data.altura} cm
-    Edad: {data.edad}
-    Restricciones: {data.restricciones}
+Formato:
 
-    Devuelve:
-
-    {{
-      "calorias": number,
-      "proteinas": number,
-      "carbohidratos": number,
-      "grasas": number,
-      "desayuno": [],
-      "almuerzo": [],
-      "merienda": [],
-      "cena": []
-    }}
-    """
+{{
+  "calorias": 0,
+  "proteinas": 0,
+  "carbohidratos": 0,
+  "grasas": 0,
+  "desayuno": [],
+  "almuerzo": [],
+  "merienda": [],
+  "cena": [],
+  "consejos": []
+}}
+"""
 
     response = client.chat.completions.create(
 
@@ -46,14 +42,28 @@ def generate_meal_plan(data):
 
         messages=[
             {
+                "role": "system",
+                "content": "Responde SOLO JSON."
+            },
+            {
                 "role": "user",
                 "content": prompt
             }
         ],
 
-        temperature=0.7
+        temperature=0.7,
+
+        max_tokens=1200
     )
 
     content = response.choices[0].message.content
+
+    content = content.replace(
+        "```json",
+        ""
+    ).replace(
+        "```",
+        ""
+    )
 
     return json.loads(content)

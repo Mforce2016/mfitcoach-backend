@@ -1,8 +1,8 @@
+import firebase_admin
 import os
 import json
-import firebase_admin
-
-from firebase_admin import credentials, firestore
+from firebase_admin import credentials
+from firebase_admin import firestore
 
 firebase_json = os.getenv("FIREBASE_CREDENTIALS")
 
