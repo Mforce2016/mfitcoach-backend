@@ -6,22 +6,26 @@ from slowapi.util import get_remote_address
 from slowapi.middleware import SlowAPIMiddleware
 
 from app.routes.ai import router as ai_router
+from app.routes.chat import router as chat_router
 
 # 🔹 Rate limit
 limiter = Limiter(
     key_func=get_remote_address
 )
 
+# 🔹 App
 app = FastAPI(
     title="FitCoach Backend",
     version="1.0.0"
 )
 
-# 🔹 Asignar limiter
+# 🔹 Limiter
 app.state.limiter = limiter
 
 # 🔹 Middleware rate limit
-app.add_middleware(SlowAPIMiddleware)
+app.add_middleware(
+    SlowAPIMiddleware
+)
 
 # 🔹 CORS
 app.add_middleware(
@@ -45,7 +49,13 @@ app.include_router(
     tags=["AI"]
 )
 
+app.include_router(
+    chat_router,
+    prefix="/api/chat",
+    tags=["Chat AI"]
+)
 
+# 🔹 Root
 @app.get("/")
 def root():
 
