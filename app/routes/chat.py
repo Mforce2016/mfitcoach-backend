@@ -14,7 +14,7 @@ router = APIRouter()
 COSTO_CHAT = 1
 
 
-@router.post("/chat")
+@router.post("")
 def nutrition_chat(
     data: ChatRequest,
     user=Depends(verify_firebase_token)
