@@ -1,12 +1,12 @@
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
+
 from app.services.memory_ai_service import analyze_memory
 from app.services.memory_service import update_student_memory
 from app.models.chat import ChatRequest
 from app.services.firebase_service import db
 from app.services.openai_service import chat_with_nutrition_ai
-
 from app.core.security import verify_firebase_token
 
 router = APIRouter()
@@ -20,7 +20,7 @@ def nutrition_chat(
     user=Depends(verify_firebase_token)
 ):
 
-    # 🔹 Buscar alumno
+    # Buscar alumno
     alumno_ref = db.collection("alumnos").document(data.dni)
 
     alumno_doc = alumno_ref.get()
@@ -34,7 +34,7 @@ def nutrition_chat(
 
     alumno = alumno_doc.to_dict()
 
-    # 🔹 Verificar fichas
+    # Verificar fichas
     fichas = alumno.get("fichas", 0)
 
     if fichas < COSTO_CHAT:
@@ -44,14 +44,14 @@ def nutrition_chat(
             detail="Fichas insuficientes"
         )
 
-    # 🔹 Consumir ficha
+    # Consumir ficha
     nuevas_fichas = fichas - COSTO_CHAT
 
     alumno_ref.update({
         "fichas": nuevas_fichas
     })
 
-    # 🔹 Analizar memoria IA
+    # Analizar memoria IA
     memory_data = analyze_memory(
         alumno=alumno,
         message=data.message
@@ -62,18 +62,18 @@ def nutrition_chat(
         data=memory_data
     )
 
-    # 🔹 Generar respuesta IA
+    # Generar respuesta IA
     respuesta = chat_with_nutrition_ai(
         alumno,
-        data.mensaje
+        data.message
     )
 
-    # 🔹 Guardar historial
+    # Guardar historial
     db.collection("chat_history").add({
 
         "dni": data.dni,
 
-        "mensaje": data.mensaje,
+        "mensaje": data.message,
 
         "respuesta": respuesta,
 
@@ -86,7 +86,7 @@ def nutrition_chat(
 
         "success": True,
 
-        "respuesta": respuesta,
+        "reply": respuesta,
 
         "fichas_restantes": nuevas_fichas
     }

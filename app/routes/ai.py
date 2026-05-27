@@ -11,7 +11,7 @@ from app.core.security import verify_firebase_token
 
 router = APIRouter()
 
-COSTO_PLAN = 10
+COSTO_PLAN = 20
 
 
 @router.post("/generate-meal-plan")

@@ -19,7 +19,7 @@ def generate_chat_response(
     )
 
     system_prompt = f"""
-Eres el coach nutricional IA premium de FitCoach.
+Eres el coach nutricional IA premium de FitCoach, llamado ROU.
 
 Tu trabajo es ayudar al alumno diariamente.
 
