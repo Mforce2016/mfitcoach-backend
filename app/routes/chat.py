@@ -12,7 +12,6 @@ router = APIRouter()
 
 COSTO_CHAT = 1
 
-
 @router.post("")
 def nutrition_chat(
     data: ChatRequest,
@@ -93,18 +92,11 @@ def nutrition_chat(
     history_docs = (
 
         db.collection("chat_history")
-
-        .where(
-            "dni",
-            "==",
-            data.dni
-        )
-
+        .where("dni", "==", data.dni)
         .order_by("timestamp")
-
         .limit_to_last(10)
+        .get()
 
-        .stream()
     )
 
     historial = []
@@ -148,12 +140,23 @@ def nutrition_chat(
     # 🔹 GENERAR RESPUESTA IA
     # =====================================================
 
-    respuesta = generate_chat_response(
+    try:
 
-        historial=historial,
+        respuesta = generate_chat_response(
 
-        alumno=alumno
-    )
+            historial=historial,
+
+            alumno=alumno
+        )
+
+    except Exception as e:
+
+        print("ERROR OPENAI:", e)
+
+        respuesta = (
+            "⚠️ Rou está tardando más de lo normal. "
+            "Intentá nuevamente en unos segundos."
+        )
 
     # =====================================================
     # 🔹 GUARDAR HISTORIAL
