@@ -1,12 +1,12 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import HTTPException
+from datetime import datetime
 
-from app.services.memory_ai_service import analyze_memory
-from app.services.memory_service import update_student_memory
+from fastapi import APIRouter
+from fastapi import HTTPException
 from app.models.chat import ChatRequest
 from app.services.firebase_service import db
-from app.services.openai_service import chat_with_nutrition_ai
+from app.services.memory_ai_service import analyze_memory
+from app.services.memory_service import update_student_memory
+from app.services.chat_service import generate_chat_response
 
 router = APIRouter()
 
@@ -18,8 +18,14 @@ def nutrition_chat(
     data: ChatRequest,
 ):
 
-    # Buscar alumno
-    alumno_ref = db.collection("alumnos").document(data.dni)
+    # =====================================================
+    # 🔹 BUSCAR ALUMNO
+    # =====================================================
+
+    alumno_ref = (
+        db.collection("alumnos")
+        .document(data.dni)
+    )
 
     alumno_doc = alumno_ref.get()
 
@@ -32,7 +38,10 @@ def nutrition_chat(
 
     alumno = alumno_doc.to_dict()
 
-    # Verificar fichas
+    # =====================================================
+    # 🔹 VERIFICAR FICHAS
+    # =====================================================
+
     fichas = alumno.get("fichas", 0)
 
     if fichas < COSTO_CHAT:
@@ -42,31 +51,114 @@ def nutrition_chat(
             detail="Fichas insuficientes"
         )
 
-    # Consumir ficha
+    # =====================================================
+    # 🔹 DESCONTAR FICHA
+    # =====================================================
+
     nuevas_fichas = fichas - COSTO_CHAT
 
     alumno_ref.update({
+
         "fichas": nuevas_fichas
     })
 
-    # Analizar memoria IA
-    memory_data = analyze_memory(
-        alumno=alumno,
-        message=data.message
+    # =====================================================
+    # 🔹 ANALIZAR MEMORIA IA
+    # =====================================================
+
+    try:
+
+        memory_data = analyze_memory(
+
+            alumno=alumno,
+
+            message=data.message
+        )
+
+        update_student_memory(
+
+            dni=data.dni,
+
+            data=memory_data
+        )
+
+    except Exception as e:
+
+        print("ERROR MEMORIA IA:", e)
+
+    # =====================================================
+    # 🔹 OBTENER HISTORIAL CHAT
+    # =====================================================
+
+    history_docs = (
+
+        db.collection("chat_history")
+
+        .where(
+            "dni",
+            "==",
+            data.dni
+        )
+
+        .order_by("timestamp")
+
+        .limit_to_last(10)
+
+        .stream()
     )
 
-    update_student_memory(
-        dni=data.dni,
-        data=memory_data
+    historial = []
+
+    for doc in history_docs:
+
+        item = doc.to_dict()
+
+        historial.append({
+
+            "role": "user",
+
+            "content": item.get(
+                "mensaje",
+                ""
+            )
+        })
+
+        historial.append({
+
+            "role": "assistant",
+
+            "content": item.get(
+                "respuesta",
+                ""
+            )
+        })
+
+    # =====================================================
+    # 🔹 NUEVO MENSAJE USUARIO
+    # =====================================================
+
+    historial.append({
+
+        "role": "user",
+
+        "content": data.message
+    })
+
+    # =====================================================
+    # 🔹 GENERAR RESPUESTA IA
+    # =====================================================
+
+    respuesta = generate_chat_response(
+
+        historial=historial,
+
+        alumno=alumno
     )
 
-    # Generar respuesta IA
-    respuesta = chat_with_nutrition_ai(
-        alumno,
-        data.message
-    )
+    # =====================================================
+    # 🔹 GUARDAR HISTORIAL
+    # =====================================================
 
-    # Guardar historial
     db.collection("chat_history").add({
 
         "dni": data.dni,
@@ -75,8 +167,14 @@ def nutrition_chat(
 
         "respuesta": respuesta,
 
-        "fichas_gastadas": COSTO_CHAT
+        "fichas_gastadas": COSTO_CHAT,
+
+        "timestamp": datetime.utcnow()
     })
+
+    # =====================================================
+    # 🔹 RESPUESTA FINAL
+    # =====================================================
 
     return {
 
