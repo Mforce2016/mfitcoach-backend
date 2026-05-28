@@ -35,6 +35,9 @@ Formato:
   "objetivo": "",
   "restricciones": [],
   "habitos": [],
+  "alimentos_favoritos": [],
+  "alimentos_no_gustan": [],
+  "suplementos": [],
   "motivacion": ""
 }}
 """
