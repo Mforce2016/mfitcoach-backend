@@ -1,13 +1,10 @@
 from fastapi import APIRouter
-from fastapi import Depends
 from fastapi import HTTPException
 
 from app.models.nutrition import NutritionRequest
 
 from app.services.firebase_service import db
 from app.services.openai_service import generate_meal_plan
-
-from app.core.security import verify_firebase_token
 
 router = APIRouter()
 
@@ -16,8 +13,7 @@ COSTO_PLAN = 20
 
 @router.post("/generate-meal-plan")
 def generate_plan(
-    data: NutritionRequest,
-    user=Depends(verify_firebase_token)
+    data: NutritionRequest
 ):
 
     alumno_ref = db.collection("alumnos").document(data.dni)
@@ -58,9 +54,7 @@ def generate_plan(
 
         "plan": plan,
 
-        "fichas_gastadas": COSTO_PLAN,
-
-        "uid": user["uid"]
+        "fichas_gastadas": COSTO_PLAN
     })
 
     return {

@@ -7,7 +7,6 @@ from app.services.memory_service import update_student_memory
 from app.models.chat import ChatRequest
 from app.services.firebase_service import db
 from app.services.openai_service import chat_with_nutrition_ai
-from app.core.security import verify_firebase_token
 
 router = APIRouter()
 
@@ -17,7 +16,6 @@ COSTO_CHAT = 1
 @router.post("")
 def nutrition_chat(
     data: ChatRequest,
-    user=Depends(verify_firebase_token)
 ):
 
     # Buscar alumno
@@ -77,9 +75,7 @@ def nutrition_chat(
 
         "respuesta": respuesta,
 
-        "fichas_gastadas": COSTO_CHAT,
-
-        "uid": user["uid"]
+        "fichas_gastadas": COSTO_CHAT
     })
 
     return {
