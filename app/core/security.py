@@ -24,9 +24,15 @@ def verify_firebase_token(
 
         return decoded_token
 
-    except Exception:
+
+    except Exception as e:
+
+        print("ERROR FIREBASE:", str(e))
 
         raise HTTPException(
+
             status_code=401,
-            detail="Token inválido"
+
+            detail=f"Token inválido: {str(e)}"
+
         )

@@ -6,6 +6,12 @@ from firebase_admin import firestore
 
 firebase_json = os.getenv("FIREBASE_CREDENTIALS")
 
+if not firebase_json:
+
+    raise Exception(
+        "FIREBASE_CREDENTIALS no encontrada"
+    )
+
 cred_dict = json.loads(firebase_json)
 
 cred = credentials.Certificate(cred_dict)
