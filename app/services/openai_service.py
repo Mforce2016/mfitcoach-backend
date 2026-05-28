@@ -13,82 +13,66 @@ client = OpenAI(
 # =========================================================
 
 def generate_meal_plan(data):
-
     prompt = f"""
-Eres un nutricionista deportivo profesional.
+    Eres un nutricionista deportivo profesional de elite.
 
-Genera un plan alimenticio semanal.
+    Debes crear un plan alimenticio semanal COMPLETO y PROFESIONAL.
 
-Devuelve SOLO JSON válido.
+    IMPORTANTE:
 
-Datos del alumno:
+    * SOLO nutrición
+    * NO ejercicios
+    * NO rutinas
+    * NO entrenamiento físico
+    * NO consejos médicos
 
-Objetivo: {data.objetivo}
-Peso: {data.peso}
-Altura: {data.altura}
-Edad: {data.edad}
-Sexo: {data.sexo}
+    OBJETIVO DEL ALUMNO:
+    {data.objetivo}
 
-Formato:
+    DATOS:
 
-{{
-  "calorias": 0,
-  "proteinas": 0,
-  "carbohidratos": 0,
-  "grasas": 0,
+    Peso: {data.peso} kg
+    Altura: {data.altura} cm
+    Edad: {data.edad}
+    Sexo: {data.sexo}
+    Nivel de actividad: {data.nivel_actividad}
 
-  "lunes": {{
-    "desayuno": [],
-    "almuerzo": [],
-    "merienda": [],
-    "cena": []
-  }},
+    Restricciones:
+    {data.restricciones}
 
-  "martes": {{
-    "desayuno": [],
-    "almuerzo": [],
-    "merienda": [],
-    "cena": []
-  }},
+    Comidas por día:
+    {data.comidas_por_dia}
 
-  "miercoles": {{
-    "desayuno": [],
-    "almuerzo": [],
-    "merienda": [],
-    "cena": []
-  }},
+    REQUISITOS DEL PLAN:
 
-  "jueves": {{
-    "desayuno": [],
-    "almuerzo": [],
-    "merienda": [],
-    "cena": []
-  }},
+    * generar 7 días completos
+    * desayuno
+    * media mañana
+    * almuerzo
+    * merienda
+    * cena
 
-  "viernes": {{
-    "desayuno": [],
-    "almuerzo": [],
-    "merienda": [],
-    "cena": []
-  }},
+    Cada comida debe incluir:
 
-  "sabado": {{
-    "desayuno": [],
-    "almuerzo": [],
-    "merienda": [],
-    "cena": []
-  }},
+    * alimentos específicos
+    * cantidades aproximadas
+    * explicación breve del objetivo nutricional
 
-  "domingo": {{
-    "desayuno": [],
-    "almuerzo": [],
-    "merienda": [],
-    "cena": []
-  }},
+    El plan debe:
 
-  "consejos": []
-}}
-"""
+    * ser variado
+    * ser realista
+    * ser saludable
+    * priorizar adherencia
+    * evitar dietas extremas
+    * adaptarse al objetivo
+
+    NO repetir las mismas comidas todos los días.
+
+    El estilo debe parecer hecho por un nutricionista deportivo real.
+
+    Devuelve SOLO JSON válido.
+    """
 
     response = client.chat.completions.create(
 

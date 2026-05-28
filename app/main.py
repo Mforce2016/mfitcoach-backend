@@ -60,5 +60,5 @@ app.include_router(
 def root():
 
     return {
-        "status": "FitCoach Backend Running"
+        "status": "Coach Backend Running"
     }
