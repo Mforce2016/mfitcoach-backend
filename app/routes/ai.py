@@ -63,5 +63,5 @@ def generate_plan(
 
         "fichas_restantes": nuevas_fichas,
 
-        "plan": plan
+        "plan": plan["plan"]
     }
