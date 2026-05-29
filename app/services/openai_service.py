@@ -13,66 +13,70 @@ client = OpenAI(
 # =========================================================
 
 def generate_meal_plan(data):
+
     prompt = f"""
-    Eres un nutricionista deportivo profesional de elite.
+Eres un nutricionista deportivo profesional de elite.
 
-    Debes crear un plan alimenticio semanal COMPLETO y PROFESIONAL.
+Debes crear un plan alimenticio semanal COMPLETO y PROFESIONAL.
 
-    IMPORTANTE:
+IMPORTANTE:
 
-    * SOLO nutrición
-    * NO ejercicios
-    * NO rutinas
-    * NO entrenamiento físico
-    * NO consejos médicos
+- SOLO nutrición
+- NO ejercicios
+- NO rutinas
+- NO entrenamiento físico
+- NO consejos médicos
 
-    OBJETIVO DEL ALUMNO:
-    {data.objetivo}
+OBJETIVO DEL ALUMNO:
+{data.objetivo}
 
-    DATOS:
+DATOS:
 
-    Peso: {data.peso} kg
-    Altura: {data.altura} cm
-    Edad: {data.edad}
-    Sexo: {data.sexo}
-    Nivel de actividad: {data.nivel_actividad}
+Peso: {data.peso} kg
+Altura: {data.altura} cm
+Edad: {data.edad}
+Sexo: {data.sexo}
+Nivel de actividad: {data.nivel_actividad}
 
-    Restricciones:
-    {data.restricciones}
+Restricciones:
+{data.restricciones}
 
-    Comidas por día:
-    {data.comidas_por_dia}
+Comidas por día:
+{data.comidas_por_dia}
 
-    REQUISITOS DEL PLAN:
+REQUISITOS DEL PLAN:
 
-    * generar 7 días completos
-    * desayuno
-    * media mañana
-    * almuerzo
-    * merienda
-    * cena
+- generar 7 días completos
+- desayuno
+- media mañana
+- almuerzo
+- merienda
+- cena
 
-    Cada comida debe incluir:
+Cada comida debe incluir:
 
-    * alimentos específicos
-    * cantidades aproximadas
-    * explicación breve del objetivo nutricional
+- alimentos específicos
+- cantidades aproximadas
+- explicación breve del objetivo nutricional
 
-    El plan debe:
+El plan debe:
 
-    * ser variado
-    * ser realista
-    * ser saludable
-    * priorizar adherencia
-    * evitar dietas extremas
-    * adaptarse al objetivo
+- ser variado
+- ser realista
+- ser saludable
+- priorizar adherencia
+- evitar dietas extremas
+- adaptarse al objetivo
 
-    NO repetir las mismas comidas todos los días.
+NO repetir las mismas comidas todos los días.
 
-    El estilo debe parecer hecho por un nutricionista deportivo real.
+El estilo debe parecer hecho por un nutricionista deportivo real.
 
-    Devuelve SOLO JSON válido.
-    """
+IMPORTANTE:
+RESPONDE SOLO TEXTO PLANO.
+NO JSON.
+NO MARKDOWN.
+"""
 
     response = client.chat.completions.create(
 
@@ -88,23 +92,19 @@ Eres un nutricionista deportivo profesional premium.
 
 Debes:
 
-* responder SOLO JSON válido
-* generar planes alimenticios profesionales
-* evitar ejercicios y rutinas
-* evitar dietas extremas
-* evitar recomendaciones peligrosas
-* priorizar salud y adherencia
-* generar planes realistas y variados
-* escribir como un nutricionista humano real
+- generar planes alimenticios profesionales
+- evitar ejercicios y rutinas
+- evitar dietas extremas
+- evitar recomendaciones peligrosas
+- priorizar salud y adherencia
+- generar planes realistas y variados
+- escribir como un nutricionista humano real
 
-NO puedes:
+RESPONDE SOLO TEXTO PLANO.
 
-* recomendar esteroides
-* recomendar ayunos extremos
-* generar rutinas de entrenamiento
-* actuar como entrenador físico
-  """
-
+NO JSON.
+NO MARKDOWN.
+"""
             },
 
             {
@@ -120,15 +120,9 @@ NO puedes:
 
     content = response.choices[0].message.content
 
-    content = content.replace(
-        "```json",
-        ""
-    ).replace(
-        "```",
-        ""
-    )
-
-    return json.loads(content)
+    return {
+        "plan": content
+    }
 
 
 # =========================================================
